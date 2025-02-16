@@ -19,3 +19,6 @@ EXPOSE 80
 
 # Start Apache
 CMD ["apache2-foreground"]
+
+
+COPY index.php /var/www/html/index.php
