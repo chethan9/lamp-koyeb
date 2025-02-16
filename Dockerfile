@@ -1,24 +1,23 @@
-# Use an official PHP with Apache image
-FROM php:8.2-apache
+FROM ubuntu:20.04
 
-# Install necessary dependencies
+# Install required dependencies
 RUN apt-get update && apt-get install -y \
-    libpng-dev libjpeg-dev libfreetype6-dev zip unzip \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd mysqli pdo pdo_mysql \
-    && a2enmod rewrite
+    wget libaio1 libncurses5 x11vnc xvfb fluxbox \
+    && apt-get clean
 
-# Set working directory
-WORKDIR /var/www/html
+# Download and install AMPPS
+RUN wget -O /tmp/ampps.run http://www.ampps.com/downloads/AMPPS-3.9-linux-x86_64.run && \
+    chmod +x /tmp/ampps.run && \
+    /tmp/ampps.run --mode unattended && \
+    rm /tmp/ampps.run
 
-# Copy application files (if any)
-COPY . /var/www/html/
+# Set environment variables
+ENV PATH="/usr/local/ampps/bin:$PATH"
 
-# Expose Apache port
-EXPOSE 80
+# Expose necessary ports (Apache, MySQL, and VNC)
+EXPOSE 80 3306 5900
 
-# Start Apache
-CMD ["apache2-foreground"]
-
-
-COPY index.php /var/www/html/index.php
+# Start AMPPS and VNC server
+CMD x11vnc -forever -usepw -create && \
+    /usr/local/ampps/Ampps && \
+    tail -f /dev/null
