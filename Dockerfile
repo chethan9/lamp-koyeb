@@ -1,7 +1,7 @@
 # Use an official PHP with Apache image
 FROM php:8.2-apache
 
-# Install required dependencies
+# Install necessary dependencies
 RUN apt-get update && apt-get install -y \
     libpng-dev libjpeg-dev libfreetype6-dev zip unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -11,8 +11,11 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /var/www/html
 
+# Copy application files (if any)
+COPY . /var/www/html/
+
 # Expose Apache port
 EXPOSE 80
 
-# Start Apache in foreground
+# Start Apache
 CMD ["apache2-foreground"]
